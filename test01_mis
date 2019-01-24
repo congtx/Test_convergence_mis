@@ -1,3 +1,4 @@
+#test for 1 time
 using Compat, Random, Distributions
 Random.seed!(53)
 a=0.01
@@ -14,3 +15,33 @@ for i=1:T
 end
 Belief1=1/(1+lik_r) #belief of model 1.
 print("Belief of time",T," is:",Belief1)
+
+
+#test for parallel many worlds
+
+using Compat, Random, Distributions
+Random.seed!(53)
+
+a=0.01
+T=1000
+W=10
+num1=0
+ModT=Normal() #true payoff generating function.
+M1=Normal(1) #model 1
+M2=Normal(-1.05)
+for j=1:W
+Pri1=a #prior of H model(M1)
+S=rand(ModT,T)
+
+lik_r=(1-Pri1)/Pri1
+for i=1:T
+    lik_r=lik_r*pdf.(M2,S[i])/pdf.(M1,S[i])
+end
+
+Belief1=1/(1+lik_r) #belief of model 1.
+if Belief1>0.8
+        num1=num1+1
+    end
+print("In World",j," Belief of time",T," is:",Belief1)
+end
+print("Times that M1 win is: ",num1)
