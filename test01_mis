@@ -1,0 +1,16 @@
+using Compat, Random, Distributions
+Random.seed!(53)
+a=0.01
+T=10
+Pri1=a #prior of H model(M1)
+ModT=Normal() #true payoff generating function.
+M1=Normal(1) #model 1
+M2=Normal(-1)
+S=rand(ModT,T)
+lik_r=(1-Pri1)/Pri1
+for i=1:T
+    lik_r=lik_r*pdf.(M2,S[i])/pdf.(M1,S[i])
+    print(lik_r)
+end
+Belief1=1/(1+lik_r) #belief of model 1.
+print("Belief of time",T," is:",Belief1)
