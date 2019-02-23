@@ -45,3 +45,72 @@ if Belief1>0.8
 print("In World",j," Belief of time",T," is:",Belief1)
 end
 print("Times that M1 win is: ",num1)
+
+
+
+
+##########################################
+global A=[1.0 -0.1 ; -0.1 1.0]  #matrix of average payoff in subjective model
+a=0.01  #prior of model 1
+T=1000
+W=100
+num1=0
+num2=0
+ModT=Normal() #true payoff generating function.
+
+function Epay(ac,B)
+    if action==1 || 2
+    ee=A[1,ac]*B+A[2,ac]*(1-B)
+        return ee
+    else print("error of action space")
+    end
+end
+
+print(Epay(1,0.5))
+#= M11=Normal(A[1,1])
+M21=Normal(A[2,1]) #model 2 #a21 means the average payoff of model 2 of action 1
+M12=Normal(A[1,2])
+M22=Normal(A[2,2]) =#
+M=[Normal(A[1,1]) Normal(A[1,2]); Normal(A[2,1]) Normal(A[2,2])] #model 1  #a11 means the average payoff of model 1 of action 1
+for j=1:W
+Pri1=a #prior of H model(M1)
+S=rand(ModT,T)
+loglik_r=log((1-Pri1)/Pri1)
+Belief1=1/(1+exp(loglik_r)) #belief of model 1.
+
+for i=1:T
+if Epay(1,Belief1)>Epay(2,Belief1)
+        loglik_r=loglik_r+log(pdf.(M[2,1],S[i])/pdf.(M[1,1],S[i]))
+           if i<10 
+            print(1)
+            end
+
+elseif Epay(1,Belief1)<Epay(2,Belief1)
+        loglik_r=loglik_r+log(pdf.(M[2,2],S[i])/pdf.(M[1,2],S[i]))
+           if i<10 
+            print(2)
+            end
+    else
+        ra=rand(1:2)
+        loglik_r=loglik_r+log(pdf.(M[2,ra],S[i])/pdf.(M[1,ra],S[i]))
+            if i<10 
+            print(ra)
+            end
+        end
+        Belief1=1/(1+exp(loglik_r))#belief of model 1.
+end
+ 
+    
+if Belief1>0.9
+        num1=num1+1
+        num2=num2
+    elseif Belief1<0.1
+        num2=num2+1
+    end
+    
+end
+print("Times that M1 win is: ",num1)
+print("Times that M2 win is: ",num2)
+
+
+
