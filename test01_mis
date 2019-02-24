@@ -68,13 +68,26 @@ print("Times that M2 win is: ",num2)
 
 
 ############################################
-global A=[1.0 -0.1 ; -0.1 1.0;0 0]  #matrix of average payoff in subjective model
-Pr0=[0.1, 0.2, 0.7] #prior distribution of models.(order is w.r.t. payoff matrix)
+global A=[1.0 -0.1 ; -0.1 1.0;0.5 0.5]  #matrix of average payoff in subjective model
+global AT=[0 0]
+Pri=[0.1, 0.2, 0.7] #prior distribution of models.(order is w.r.t. payoff matrix)
 T=1000
 W=1000
 num1=0
 num2=0
-ModT=Normal() #true payoff generating function.
+
+#true payoff generating function.
+mod=fill(Normal(),length(AT)) 
+for i=1:length(AT)
+    mod[i]=Normal(AT[i])
+end
+#subjective payoff generating function.For calculating density
+M=fill(Normal(),size(A))
+for i=1:size(A,1)
+    for j=1:size(A,2)
+        M[i,j]=Normal(A[i,j])
+    end
+end
 
 function Epay(act,B)
    # if act==1||2
@@ -88,17 +101,20 @@ function Epay(act,B)
  #   end
 end
 
-#= M11=Normal(A[1,1])
-M21=Normal(A[2,1]) #model 2 #a21 means the average payoff of model 2 of action 1
-M12=Normal(A[1,2])
-M22=Normal(A[2,2]) =#
-M=[Normal(A[1,1]) Normal(A[1,2]); Normal(A[2,1]) Normal(A[2,2])] #model 1  #a11 means the average payoff of model 1 of action 1
-for j=1:W
 
-S=rand(ModT,T)
-loglik_r=log((1-Pri1)/Pri1)
+#########main
+for j=1:W
+    
+S=rand(ModT,1)
+loglik_r=log.(Pri)-fill(log(Pri[1]),length(Pri))
+    
+#update loglikelihood
+loglik_r=loglik_r+
+
 Belief1=1/(1+exp(loglik_r)) #belief of model 1.
 
+    
+    #loop for choosing actions.
 for i=1:T
 if Epay(1,Belief1)>Epay(2,Belief1)
         loglik_r=loglik_r+log(pdf.(M[2,1],S[i])/pdf.(M[1,1],S[i]))
@@ -131,3 +147,4 @@ if Belief1>0.9
 end
 print("Times that M1 win is: ",num1)
 print("Times that M2 win is: ",num2)
+
