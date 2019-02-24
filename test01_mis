@@ -104,12 +104,15 @@ end
 
 #########main
 for j=1:W
-    
-S=rand(ModT,1)
-loglik_r=log.(Pri)-fill(log(Pri[1]),length(Pri))
+S=vector(undef,T)  #empty sample vector
+loglik_r=log.(Pri)-fill(log(Pri[1]),length(Pri))  #prior loglikelihood
     
 #update loglikelihood
-loglik_r=loglik_r+
+    for e=1:size(loglik_r)
+        loglik_r[e]=loglik_r[e]+logpdf.(M[e,action],S[t])-logpdf.(M[1,action],S[t])
+    end
+         
+    
 
 Belief1=1/(1+exp(loglik_r)) #belief of model 1.
 
@@ -147,4 +150,5 @@ if Belief1>0.9
 end
 print("Times that M1 win is: ",num1)
 print("Times that M2 win is: ",num2)
+
 
