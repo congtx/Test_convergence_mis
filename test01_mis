@@ -1,3 +1,6 @@
+using Compat, Random, Distributions, Plots
+Random.seed!(153)
+
 global A=[0.08 -0.5 ;
     0.0 0.0;
     -0.5 0.5 ]  #matrix of average payoff in subjective model
